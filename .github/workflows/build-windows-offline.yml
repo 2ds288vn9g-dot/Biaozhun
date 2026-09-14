@@ -1,0 +1,53 @@
+name: 生成 Windows 离线网页启动包
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 取出仓库文件
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 解压构建源文件
+        shell: pwsh
+        run: Expand-Archive -Path "标准资料包离线源文件.zip" -DestinationPath "source" -Force
+
+      - name: 安装打包依赖
+        shell: pwsh
+        working-directory: source
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: 生成内置运行环境
+        shell: pwsh
+        working-directory: source
+        run: |
+          python -m PyInstaller --noconfirm --clean --onedir --name "标准资料包生成平台" --hidden-import streamlit.web.cli --collect-all streamlit --collect-all altair --collect-all pandas --collect-all openpyxl --collect-all lxml --collect-all py7zr --collect-all rarfile portable/launcher.py
+
+      - name: 组装离线包
+        shell: pwsh
+        working-directory: source
+        run: |
+          $package = "../release/标准资料包生成平台_离线网页启动版"
+          $runtime = "$package/运行程序"
+          New-Item -ItemType Directory -Force $runtime | Out-Null
+          Copy-Item "dist/标准资料包生成平台/*" $runtime -Recurse -Force
+          Copy-Item app.py, engine.py $runtime -Force
+          Copy-Item assets $runtime -Recurse -Force
+          Copy-Item .streamlit $runtime -Recurse -Force
+          Copy-Item portable/启动工具.bat, portable/使用说明.txt $package -Force
+          Compress-Archive -Path $package -DestinationPath "../release/标准资料包生成平台_离线网页启动版.zip" -Force
+
+      - name: 保存生成结果
+        uses: actions/upload-artifact@v4
+        with:
+          name: 标准资料包生成平台_离线网页启动版
+          path: release/标准资料包生成平台_离线网页启动版.zip
