@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: standard-document-batch-platform
+    runtime: docker
+    plan: starter
+    healthCheckPath: /_stcore/health
+    autoDeployTrigger: commit
