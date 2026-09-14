@@ -17,7 +17,7 @@ jobs:
 
       - name: 解压构建源文件
         shell: pwsh
-        run: Expand-Archive -Path "标准资料包离线源文件.zip" -DestinationPath "source" -Force
+        run: Expand-Archive -Path "标准资料包离线源文件_启动保存修复版.zip" -DestinationPath "source" -Force
 
       - name: 安装打包依赖
         shell: pwsh
@@ -30,16 +30,16 @@ jobs:
         shell: pwsh
         working-directory: source
         run: |
-          python -m PyInstaller --noconfirm --clean --onedir --name "标准资料包生成平台" --hidden-import streamlit.web.cli --collect-all streamlit --collect-all altair --collect-all pandas --collect-all openpyxl --collect-all lxml --collect-all py7zr --collect-all rarfile portable/launcher.py
+          python -m PyInstaller --noconfirm --clean --onedir --name "standard_tool" --hidden-import streamlit.web.cli --hidden-import tkinter --hidden-import tkinter.filedialog --hidden-import _tkinter --collect-all tkinter --collect-all streamlit --collect-all altair --collect-all pandas --collect-all openpyxl --collect-all lxml --collect-all py7zr --collect-all rarfile portable/launcher.py
 
       - name: 组装离线包
         shell: pwsh
         working-directory: source
         run: |
           $package = "../release/标准资料包生成平台_离线网页启动版"
-          $runtime = "$package/运行程序"
+          $runtime = "$package/runtime"
           New-Item -ItemType Directory -Force $runtime | Out-Null
-          Copy-Item "dist/标准资料包生成平台/*" $runtime -Recurse -Force
+          Copy-Item "dist/standard_tool/*" $runtime -Recurse -Force
           Copy-Item app.py, engine.py $runtime -Force
           Copy-Item assets $runtime -Recurse -Force
           Copy-Item .streamlit $runtime -Recurse -Force
