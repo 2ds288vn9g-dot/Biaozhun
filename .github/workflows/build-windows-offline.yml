@@ -17,7 +17,7 @@ jobs:
 
       - name: 解压构建源文件
         shell: pwsh
-        run: Expand-Archive -Path "标准资料包离线源文件_启动保存修复版.zip" -DestinationPath "source" -Force
+        run: Expand-Archive -Path "标准资料包离线源文件_单包起草人DOC修复版_v2.zip" -DestinationPath "source" -Force
 
       - name: 安装打包依赖
         shell: pwsh
@@ -30,7 +30,7 @@ jobs:
         shell: pwsh
         working-directory: source
         run: |
-          python -m PyInstaller --noconfirm --clean --onedir --name "standard_tool" --hidden-import streamlit.web.cli --hidden-import tkinter --hidden-import tkinter.filedialog --hidden-import _tkinter --collect-all tkinter --collect-all streamlit --collect-all altair --collect-all pandas --collect-all openpyxl --collect-all lxml --collect-all py7zr --collect-all rarfile portable/launcher.py
+          python -m PyInstaller --noconfirm --clean --onedir --name "standard_tool" --hidden-import streamlit.web.cli --hidden-import tkinter --hidden-import tkinter.filedialog --hidden-import _tkinter --hidden-import win32com.client --hidden-import pythoncom --hidden-import pywintypes --collect-all tkinter --collect-all win32com --collect-all streamlit --collect-all altair --collect-all pandas --collect-all openpyxl --collect-all lxml --collect-all py7zr --collect-all rarfile portable/launcher.py
 
       - name: 组装离线包
         shell: pwsh
